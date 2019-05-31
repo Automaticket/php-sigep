@@ -29,7 +29,7 @@ class Sedex extends AbstractChancela
     public function __construct($x, $y, $nomeRemetente, $tipoServico, \PhpSigep\Model\AccessData $accessData)
     {
         parent::__construct($x, $y, $nomeRemetente, $accessData);
-        
+
         $this->setServicoDePostagem($tipoServico);
     }
 
@@ -37,7 +37,7 @@ class Sedex extends AbstractChancela
     {
         $rClass = new \ReflectionClass(__CLASS__);
         $servicos = $rClass->getConstants();
-        
+
         if (in_array($servicoPostagem, $servicos) === false) {
             throw new \InvalidArgumentException('O serviço de postagem deve ser uma das constantes da classe');
         }

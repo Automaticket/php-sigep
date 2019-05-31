@@ -298,7 +298,7 @@ class ListaDePostagem
         $pdf->SetX($xCol2);
         $pdf->CellXp($wCol2, 'CEP', 'C');
         $pdf->SetX($xCol3);
-        $pdf->CellXp($wCol3, 'Peso(g)', 'C');
+        $pdf->CellXp($wCol3, 'Peso', 'C');
         $pdf->SetX($xCol4);
         $pdf->CellXp($wCol4, 'AR', 'C');
         $pdf->SetX($xCol5);
@@ -393,15 +393,16 @@ class ListaDePostagem
             $temVd          = false;
             $valorDeclarado = null;
             foreach ($objetoPostal->getServicosAdicionais() as $servicoAdicional) {
-                $valorDeclarado = $servicoAdicional->getValorDeclarado();
                 if ($servicoAdicional->is(ServicoAdicional::SERVICE_AVISO_DE_RECEBIMENTO)) {
                     $temAr = true;
                 } else if ($servicoAdicional->is(ServicoAdicional::SERVICE_MAO_PROPRIA)) {
                     $temMp = true;
-                } else if ($valorDeclarado>0) {
-                    $temVd = true;
+                } else if ($servicoAdicional->is(ServicoAdicional::SERVICE_VALOR_DECLARADO)) {
+                    $temVd          = true;
+                    $valorDeclarado = $servicoAdicional->getValorDeclarado();
                 }
             }
+
 
             if ($i++ % 2 != 0) {
                 $fc = 225;
@@ -426,7 +427,7 @@ class ListaDePostagem
                 $pdf->MultiCellXp($wCol8, $destino->getNumeroNotaFiscal(), null, 0, 'C');
             }
             $pdf->SetXY($xCol3, $y2);
-            $pdf->CellXp($wCol3, round($objetoPostal->getPeso()*1000), 'C');
+            $pdf->CellXp($wCol3, $objetoPostal->getPeso(), 'C');
             $pdf->SetX($xCol4);
             $pdf->CellXp($wCol4, ($temAr ? 'S' : 'N'), 'C');
             $pdf->SetX($xCol5);
@@ -450,7 +451,7 @@ class ListaDePostagem
     private function writeTitle($k, $pdf, $wInner)
     {
 // Adiciona a logo
-        $logoCorreios = realpath(dirname(__FILE__) . '/logo-correios.png');
+        $logoCorreios = realpath(dirname(__FILE__) . '/logo-correios.jpg');
         $wLogo        = 110 / $k;
         $lPosLogo     = $pdf->x;
         $pdf->Image($logoCorreios, $lPosLogo, null, $wLogo);

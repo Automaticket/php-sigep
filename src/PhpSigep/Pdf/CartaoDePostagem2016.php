@@ -212,7 +212,7 @@ class CartaoDePostagem2016
                 //$this->pdf->SetXY(66, 3, 0);
                 $this->setFillColor(150, 150, 200);
 
-                //Nao utilizados
+ 		        //Nao utilizados
                 //$wChancela = 101.5;
                 //$hChancela = 72.5;
 
@@ -226,11 +226,12 @@ class CartaoDePostagem2016
                 switch ($servicoDePostagem->getCodigo()) {
                     case ServicoDePostagem::SERVICE_PAC_41068:
                     case ServicoDePostagem::SERVICE_PAC_04510:
+                    case ServicoDePostagem::SERVICE_PAC_CONTRATO_41211:
                     case ServicoDePostagem::SERVICE_PAC_CONTRATO_AGENCIA:
                     case ServicoDePostagem::SERVICE_PAC_GRANDES_FORMATOS:
+                    case ServicoDePostagem::SERVICE_PAC_REMESSA_AGRUPADA:
                     case ServicoDePostagem::SERVICE_PAC_CONTRATO_UO:
                     case ServicoDePostagem::SERVICE_PAC_CONTRATO_AGENCIA_LM:
-                    case ServicoDePostagem::SERVICE_PAC_CONTRATO_AGENCIA_TA:
                     case ServicoDePostagem::SERVICE_PAC_CONTRATO_GRANDES_FORMATOS_LM:
                         if ($this->layoutPac === CartaoDePostagem::TYPE_CHANCELA_PAC) {
                             $chancela = new Pac($lPosChancela, $tPosChancela, $nomeRemetente, $accessData);
@@ -238,7 +239,19 @@ class CartaoDePostagem2016
                             $chancela = new Pac2016($lPosChancela, $tPosChancela, $nomeRemetente, $accessData);
                         }
                         break;
-                    case ServicoDePostagem::SERVICE_SEDEX_41556:
+
+                    case ServicoDePostagem::SERVICE_E_SEDEX_STANDARD:
+                        $tPosChancela = 3;
+                        if ($this->layoutSedex === CartaoDePostagem::TYPE_CHANCELA_SEDEX) {
+                            $chancela = new Sedex($lPosChancela, $tPosChancela, $nomeRemetente, Sedex::SERVICE_E_SEDEX, $accessData);
+                        } else {
+                            $chancela = new Sedex2016($lPosChancela, $tPosChancela, $nomeRemetente, Sedex::SERVICE_E_SEDEX, $accessData);
+                        }
+                        break;
+
+                    case ServicoDePostagem::SERVICE_SEDEX_40096:
+                    case ServicoDePostagem::SERVICE_SEDEX_40436:
+                    case ServicoDePostagem::SERVICE_SEDEX_40444:
                     case ServicoDePostagem::SERVICE_SEDEX_A_VISTA:
                     case ServicoDePostagem::SERVICE_SEDEX_VAREJO_A_COBRAR:
                     case ServicoDePostagem::SERVICE_SEDEX_PAGAMENTO_NA_ENTREGA:
@@ -247,7 +260,6 @@ class CartaoDePostagem2016
                     case ServicoDePostagem::SERVICE_SEDEX_CONTRATO_UO:
                     case ServicoDePostagem::SERVICE_SEDEX_CONTRATO_AGENCIA_LM:
                     case ServicoDePostagem::SERVICE_SEDEX_CONTRATO_GRANDES_FORMATOS_LM:
-                    case ServicoDePostagem::SERVICE_SEDEX_CONTRATO_AGENCIA_TA:
                         $tPosChancela = 3;
                         if ($this->layoutSedex === CartaoDePostagem::TYPE_CHANCELA_SEDEX) {
                             $chancela = new Sedex($lPosChancela, $tPosChancela, $nomeRemetente, Sedex::SERVICE_SEDEX, $accessData);
@@ -349,9 +361,9 @@ class CartaoDePostagem2016
 
                 // Nome legivel, doc e rubrica
                 $this->pdf->SetFontSize(7);
-                $this->pdf->SetXY(3, $this->pdf->GetY() + 24);
+                $this->pdf->SetXY(1, $this->pdf->GetY() + 24);
                 $this->t(0, 'Nome Legível:___________________________________________', 1, 'L',  null);
-                $this->pdf->SetXY(3, $this->pdf->GetY() + 1);
+                $this->pdf->SetXY(1, $this->pdf->GetY() + 1);
                 $this->t(0, 'Documento:______________________________________________', 1, 'L',  null);
 
                 // Destinatário
@@ -403,11 +415,8 @@ class CartaoDePostagem2016
                         $sSer = $sSer . "01";
                     } else if ($servicoAdicional->is(ServicoAdicional::SERVICE_MAO_PROPRIA)) {
                         $sSer = $sSer . "02";
-                    } else if ($servicoAdicional->is(ServicoAdicional::SERVICE_VALOR_DECLARADO_SEDEX)) {
+                    } else if ($servicoAdicional->is(ServicoAdicional::SERVICE_VALOR_DECLARADO)) {
                         $sSer = $sSer . "19";
-                        $valorDeclarado = $servicoAdicional->getValorDeclarado();
-                    } else if ($servicoAdicional->is(ServicoAdicional::SERVICE_VALOR_DECLARADO_PAC)) {
-                        $sSer = $sSer . "64";
                         $valorDeclarado = $servicoAdicional->getValorDeclarado();
                     } else if ($servicoAdicional->is(ServicoAdicional::SERVICE_REGISTRO)) {
                         $sSer = $sSer . "25";
@@ -481,7 +490,7 @@ class CartaoDePostagem2016
     {
         $l = $this->pdf->GetX();
         $t1 = $this->pdf->GetY();
-        $l = 2;
+        $l = 0;
 
         $titulo = 'Destinatário';
         $nomeDestinatario = $objetoPostal->getDestinatario()->getNome();
@@ -639,8 +648,8 @@ class CartaoDePostagem2016
         if ($utf8) {
             $txt = $this->_($txt);
         }
-//      $border = 1;
-//      $fill   = true;
+//		$border = 1;
+//		$fill   = true;
         $border = 0;
         $fill = false;
 
