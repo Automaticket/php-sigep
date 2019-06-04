@@ -133,7 +133,7 @@ class ImprovedFPDF extends \PhpSigepFPDF
                     } else {
                         $methodDefinition = array($this, 'set' . ucfirst($k));
                         if (is_callable($methodDefinition, true, $callable_name)) {
-                            call_user_func($methodDefinition, $v);
+                            @call_user_func($methodDefinition, $v);
                         } else {
                             $this->$k = $v;
                         }
